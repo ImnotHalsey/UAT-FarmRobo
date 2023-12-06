@@ -68,3 +68,20 @@ void loop() {
     
     delay(2000);
 }
+
+
+//  Expected output 
+
+// case 1 
+
+//   15:38:22.156 -> TimeStamp: 1
+//   15:38:22.188 -> MessageID 1: Came to Second Block! 1
+
+// case 2
+//   15:38:26.223 -> TimeStamp: 1
+//   15:38:26.223 -> MessageID 0: 0
+//   15:38:26.223 -> Control Mode: 2
+//   15:38:26.256 -> Tool Mode function activated!
+//   15:38:26.288 -> Lights: 1
+//   15:38:26.288 -> Emergency: 1
+//   15:38:26.331 -> Tool Type: 4
