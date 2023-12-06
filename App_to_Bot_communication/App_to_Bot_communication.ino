@@ -1,4 +1,4 @@
-// Bot To APP --> Mode 50-100ms communication
+// Bot To APP --> Mode 50-100ms communication // Mocking code 
 #include <SoftwareSerial.h>
 SoftwareSerial mySerial(10, 11);
 int t= 0;
@@ -30,7 +30,7 @@ public:
     }
 };
 
-
+// Bot code 
 class CommunicationProcessor {
 public:
     void HomePage(int* results) {
@@ -38,7 +38,7 @@ public:
 
         if (results[1] == 0) { Serial.print("MessageID 0: Having First Block code "); Serial.println(results[1]);
             if (results[2]) { Serial.print("Control Mode: "); Serial.println(results[2]); }
-            if (results[3] == 1) {Serial.println("Tool Mode function activated!");} else {Serial.print("Path Mode: "); Serial.println(results[3]);}
+            if (results[3] == 1) {Serial.println("Tool Mode function activated!");} else {Serial.print("Path Mode: "); Serial.println(results[3]);} // If pathmode is road then what about tool type 
             if (results[4]) { Serial.print("Lights: "); Serial.println(results[4]); }
             if (results[5]) { Serial.print("Emergency: "); Serial.println(results[5]); }
             if (results[6]) { Serial.print("Tool Type: "); Serial.println(results[6]); }
@@ -72,10 +72,19 @@ public:
               if (results[5] == 1 ){ Serial.println("Selected Row Spacing is 18 Inches");}
               else if (results[5] == 2 ){ Serial.println("Selected Row Spacing is 20 Inches");}
               else if (results[5] == 3 ){ Serial.println("Selected Row Spacing is 23 Inches");}}
-        
+
+            if (results[6] && ((results[2] == 1) || (results[2] == 3)) && (results[6] == 1)) {Serial.println("Blade size set to 450MM");}
+              else if (results[6] && ((results[2] == 1) || (results[2] == 3)) && (results[6] == 2)) {Serial.println("Blade size set to 600MM");}
+
+            if (results[7] && (results[2] == 1) && (results[7] == 1)) {Serial.println("Selected Depth is 2 Inches");}        
+              else if (results[7] && (results[2] == 1) && (results[7] == 2)) {Serial.println("Selected Depth is 3 Inches");}        
+              else if (results[7] && (results[2] == 1) && (results[7] == 3)) {Serial.println("Selected Depth is 4 Inches");}    
+
+            // Tyne and Rotavator speed is pending for ....    
         }
     }
 };
+
 
 
 
@@ -83,11 +92,11 @@ void loop() {
     SensorDataProcessor dataProcessor;
     CommunicationProcessor communicationProcessor;
     
-    int results[7];
+    int results[10];
     dataProcessor.ArrayMaker(results);
     communicationProcessor.HomePage(results);
     
-    delay(2000);
+    delay(1000);
 }
 
 
