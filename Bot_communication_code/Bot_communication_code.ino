@@ -1,70 +1,88 @@
-// -------------------> Bot Code <-------------------\\
-
-//  --> Required Libraries 
+// Bot To APP 
 #include <SoftwareSerial.h>
 
-SoftwareSerial mySerial(10, 11); // As testing went on using Software serial 
+SoftwareSerial mySerial(10, 11);
 
-// The follwing line won't be needed in production version 
-struct SensorData {long timestint t2MotorTemperature;int t3MotorDriverTemperature;float waterLevel;int EmergencyAlert;};
-
-void setup() { // To View the communication 
-                Serial.begin(9600);
-                mySerial.begin(9600);}
-
-// Class for all sensory communication processing ...
 class SensorDataProcessor {
 public:
-  long get_timestamp() { return 0; }   //  get time stamp code.
-  float get_botBattery_voltage() { return random(45, 61); } // get battery voltage
-  int get_T1MortorTemp() { return random(15, 120); } // get T1 Mortor Temperature 
-  int get_T2MortorTemp() { return random(15, 120); } // get T2 Mortor Temperature 
-  int get_T3MortorDriverTemp() { return random(15, 120); }  // get T3 Mortor Driver Temperature 
-  float get_WaterLevelValue() { return random(0, 101); } // get waterLevel value 
+  long get_timestamp() {return 0;} 
 
-  int EmergencyAlert() {   // get Emergency Alert
-    // Check the following parameters 
-      // --> Parameters will be checked from the above functions only  --> If Flase returned by the function it will be considered as Error!
-        //  --> 1. checks water level 
-        //  --> 2. checks current draw [low and high ] -- (of what need to be declared yet)
-        //  --> 3. checks for Temperatures [low and High] -- (of motors[T1, T2] and drivers[T3])
-        //  --> 4. checks for battery voltage level [Low and High]
-        //  --> 5. Finally Gives the Error code according to the conditions above and Documentations 
+  int get_botBattery_voltage() {return random(45, 61);}
 
-    return 0;}};
+  int get_T1MortorTemp() {
+    return random(15, 120);}
 
-SensorData ArrayMaker() {
-    SensorDataProcessor dataProcessor;
-    SensorData data;
+  int get_T2MortorTemp() {
+    return random(15, 120);}
 
-    data.timestamp = dataProcessor.get_timestamp();
-    data.botBatteryVoltage = dataProcessor.get_botBattery_voltage();
-    data.t1MotorTemperature = dataProcessor.get_T1MortorTemp();
-    data.t2MotorTemperature = dataProcessor.get_T2MortorTemp();
-    data.t3MotorDriverTemperature = dataProcessor.get_T3MortorDriverTemp();
-    data.waterLevel = dataProcessor.get_WaterLevelValue();
-    data.EmergencyAlert = dataProcessor.EmergencyAlert();
+  int get_T3MortorDriverTemp() {
+    return random(15, 120);}
 
-    return data;
-}
+  int get_WaterLevelValue() {
+    return random(0, 101);}
 
-void sendData(const SensorData & data) {
-    mySerial.write((uint8_t*)&data, sizeof(SensorData));
+  int get_Steering_angle() {
+    return random(-60, 60);}
 
-    // Print individual values without a custom print function --> Remove this in prod !
-    Serial.println("Sent data as an array");
-    Serial.print("Timestamp: "); Serial.println(data.timestamp);
-    Serial.print("Bot battery: "); Serial.println(data.botBatteryVoltage);
-    Serial.print("T1 Motor temperature: "); Serial.println(data.t1MotorTemperature);
-    Serial.print("T2 Motor temperature: "); Serial.println(data.t2MotorTemperature);
-    Serial.print("T3 Motor Driver temperature: "); Serial.println(data.t3MotorDriverTemperature);
-    Serial.print("Water Level: "); Serial.println(data.waterLevel);
-    Serial.print("Emergency Alert: "); Serial.println(data.EmergencyAlert);
+  int*  EmergencyAlert() {
+    int results[] = {0, 0, 0,0, 0, 0,0, 0, 0, 0, 0,0};
+    results[0] = get_timestamp();
+    results[1] = get_botBattery_voltage();
+    results[2] = get_T1MortorTemp();
+    results[3] = get_T2MortorTemp();
+    results[4] = get_T3MortorDriverTemp();
+    results[5] = get_WaterLevelValue();
+    results[6] = get_Steering_angle();
 
+    if (results[1] <= 45 || results[1] >= 61) {
+      Serial.println("Battery is going to Sambhavam!");
+      results[7] = 1;
+    }
+
+    if (results[2] <= 15 || results[2] >= 120) {
+      Serial.println("T1 Mortor is going to Sambhavam!");
+      results[8] = 1;
+    }
+
+    if (results[3] <= 15 || results[3] >= 120) {
+      Serial.println("T2 Mortor is going to Sambhavam!");
+      results[9] = 1;
+    }
+
+    if (results[4] <= 15 || results[4] >= 120) {
+      Serial.println("T3 Mortor Driver is going to Sambhavam!");
+      results[10] = 1;
+    }
+
+    if (results[5] <= 15 || results[5] >= 100) {
+      Serial.println("Low Water Level");
+      results[11] = 1;
+    }
+
+    // Print the results array  // ----------> Write code to return the result list in the production 
+    Serial.print("Results Array: ");
+    for (size_t i = 0; i < sizeof(results) / sizeof(results[0]); ++i) {
+      Serial.print(results[i]);
+      Serial.print(" ");
+    }
+    Serial.println();
+  }
+};
+
+SensorDataProcessor sensor;
+
+
+void setup() {
+  Serial.begin(9600);
+  mySerial.begin(9600);
 }
 
 void loop() {
-    SensorData randomData = ArrayMaker();
-    sendData(randomData);
-    delay(1000);
+  sensor.EmergencyAlert();
+  delay(1000);
 }
+
+
+//  Expected output
+// 10:52:19.030 -> T3 Mortor Driver is going to Sambhavam!
+// 10:52:19.063 -> Results Array: 0 47 46 98 15 41 0 0 0 1 0 
